@@ -223,8 +223,6 @@ def binarize(outfile, file_to_open, file_to_save, thresholdNDVI):
     arr = array(img)
     w = arr.shape[0]
     h = arr.shape[1]
-    # print(w,h)
-    # print(arr)
 
     for i in range(w):
         for j in range(h):
@@ -232,7 +230,6 @@ def binarize(outfile, file_to_open, file_to_save, thresholdNDVI):
                 arr[i,j]=1
             else:
                 arr[i,j]=0
-    # print(arr)
 
     img = Image.fromarray(arr)
     img.save(file_to_save)
