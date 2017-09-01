@@ -57,9 +57,8 @@ def state_celery_task():
 # ndvi issu du traitement par le script python
 @app.route('/ndviAuto')
 def get_ndviAuto():
-    a = len(db.engine.table_names())
-    print(db.engine.table_names())
-    ndvi_table = ndvi_auto(db.engine.table_names()[a-1])
+    table_name = params['table_name']
+    ndvi_table = ndvi_auto(table_name)
     query1 = select([ndvi_table.c.ogc_fid.label('ogc_fid'), func.ST_AsGeoJSON(func.ST_Transform(ndvi_table.c.wkb_geometry,4326)).label('wkb_geometry')]).where(ndvi_table.c.wkb_geometry!=None)
     dataQuery = db.session.execute(query1).fetchall()
 
