@@ -55,17 +55,33 @@ def state_celery_task():
     return jsonify({'state': res.ready(), 'table_name': table_name})
 
 # ndvi issu du traitement par le script python
-@app.route('/ndviAuto')
+@app.route('/ndviAuto', methods=['POST'])
 def get_ndviAuto():
+    params = request.json
     table_name = params['table_name']
     ndvi_table = ndvi_auto(table_name)
     query1 = select([ndvi_table.c.ogc_fid.label('ogc_fid'), func.ST_AsGeoJSON(func.ST_Transform(ndvi_table.c.wkb_geometry,4326)).label('wkb_geometry')]).where(ndvi_table.c.wkb_geometry!=None)
     dataQuery = db.session.execute(query1).fetchall()
 
-    query2 = select([func.ST_AsText(func.ST_Centroid(func.ST_Extent(func.ST_Transform(func.ST_Transform(ndvi_table.c.wkb_geometry, 32631), 4326))))])
-    dataQuery2 = db.session.execute(query2).fetchall()
-    lat_center = float(dataQuery2[0][0][22:38])
-    lng_center = float(dataQuery2[0][0][6:21])
+    queryX = select([func.ST_X(
+                            func.ST_Centroid(
+                                func.ST_Extent(
+                                    func.ST_Transform(
+                                        func.ST_Transform(ndvi_table.c.wkb_geometry, 32631), 4326)
+                    )))])
+    dataQueryX = db.session.execute(queryX).fetchall()
+
+    queryY = select([func.ST_Y(
+                        func.ST_Centroid(
+                            func.ST_Extent(
+                                func.ST_Transform(
+                                    func.ST_Transform(ndvi_table.c.wkb_geometry, 32631), 4326)
+                    )))])
+    dataQueryY = db.session.execute(queryY).fetchall()
+
+    lat_center = float(dataQueryY[0][0])
+    lng_center = float(dataQueryX[0][0])
+    
     data_all = []
     data_all.append({'coords_center': {
                             'lat': lat_center,
