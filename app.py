@@ -42,8 +42,8 @@ def get_javascript_data():
     city = params['city']
     coords = params['coords']
     data_search = passData(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords)
-    table = ndvi_auto('ndvi_'+ city)
     result = test.delay(data_search)
+
     return jsonify({'message': 'le traitement est en cours', 'bdd': 'ndvi_'+ city, 'id_task': result.id})
 #
 @app.route('/checkCeleryTask', methods=['POST'])
@@ -51,15 +51,25 @@ def state_celery_task():
     params = request.json
     table_name = params['table_name']
     id_task = params['id_task']
+    city = params['city']
     res = test.AsyncResult(id_task)
-    return jsonify({'state': res.ready(), 'table_name': table_name})
+    return jsonify({'state': res.ready(), 'table_name': table_name, 'city': city})
 
 # ndvi issu du traitement par le script python
 @app.route('/ndviAuto', methods=['POST'])
 def get_ndviAuto():
     params = request.json
     table_name = params['table_name']
-    ndvi_table = ndvi_auto(table_name)
+    city = params['city']
+
+    b4 = city + '/clip_B04.tif'
+    with rasterio.open(b4) as red:
+        RED = red.read()
+    profile = red.meta
+    epsg = profile['crs']['init'][5:]
+    print(epsg)
+
+    ndvi_table = ndvi_auto(table_name, epsg)
     query1 = select([ndvi_table.c.ogc_fid.label('ogc_fid'), func.ST_AsGeoJSON(func.ST_Transform(ndvi_table.c.wkb_geometry,4326)).label('wkb_geometry')]).where(ndvi_table.c.wkb_geometry!=None)
     dataQuery = db.session.execute(query1).fetchall()
 
@@ -67,7 +77,7 @@ def get_ndviAuto():
                             func.ST_Centroid(
                                 func.ST_Extent(
                                     func.ST_Transform(
-                                        func.ST_Transform(ndvi_table.c.wkb_geometry, 32631), 4326)
+                                        func.ST_Transform(ndvi_table.c.wkb_geometry, epsg), 4326)
                     )))])
     dataQueryX = db.session.execute(queryX).fetchall()
 
@@ -75,7 +85,7 @@ def get_ndviAuto():
                         func.ST_Centroid(
                             func.ST_Extent(
                                 func.ST_Transform(
-                                    func.ST_Transform(ndvi_table.c.wkb_geometry, 32631), 4326)
+                                    func.ST_Transform(ndvi_table.c.wkb_geometry, epsg), 4326)
                     )))])
     dataQueryY = db.session.execute(queryY).fetchall()
 

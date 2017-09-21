@@ -33,12 +33,12 @@ class passData():
         return (print("traitement terminé"))
 
 
-def ndvi_auto(city):
+def ndvi_auto(city, epsg):
     return table(
         '{}'.format(city),
         db.Column('ogc_fid', db.Integer),
         db.Column('wkb_geometry', Geometry(geometry_type='POLYGON',
-                                        srid=32631)))
+                                        srid=epsg)))
 
 # cette classe prend en entrée un objet, on fait hériter cette classe aux autres, la fonction de conversion
 # de la géométrie se fera
