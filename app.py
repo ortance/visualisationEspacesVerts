@@ -62,12 +62,11 @@ def get_ndviAuto():
     table_name = params['table_name']
     city = params['city']
 
-    b4 = city + '/clip_B04.tif'
-    with rasterio.open(b4) as red:
-        RED = red.read()
-    profile = red.meta
+    image = city + '/clip_B04.tif'
+    with rasterio.open(image) as getProj:
+        PROJ = getProj.read()
+    profile = getProj.meta
     epsg = profile['crs']['init'][5:]
-    print(epsg)
 
     ndvi_table = ndvi_auto(table_name, epsg)
     query1 = select([ndvi_table.c.ogc_fid.label('ogc_fid'), func.ST_AsGeoJSON(func.ST_Transform(ndvi_table.c.wkb_geometry,4326)).label('wkb_geometry')]).where(ndvi_table.c.wkb_geometry!=None)
@@ -91,7 +90,7 @@ def get_ndviAuto():
 
     lat_center = float(dataQueryY[0][0])
     lng_center = float(dataQueryX[0][0])
-    
+
     data_all = []
     data_all.append({'coords_center': {
                             'lat': lat_center,

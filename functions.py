@@ -79,11 +79,18 @@ def main_script(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, co
 
         ##################### création d'un shapefile qui délimite la zone d'intérêt ###############
         coordinates = request_body["search"]["shape"]["coordinates"][int(0)]
-        new_coords = convert_coords(4326, 32631, coordinates)
+
+        image = result[0]['sceneID'] + '\B04.jp2'
+        with rasterio.open(image) as im:
+            PROJ = im.read()
+        profile = im.meta
+        epsg = int(profile['crs']['init'][5:])
+
+        new_coords = convert_coords(4326, epsg, coordinates)
         poly = create_polygon(new_coords)
-        out_shp = r'polygon32631.shp'
+        out_shp = r'polygonShape.shp'
         write_shapefile(poly, out_shp)
-        projection(32631)
+        projection(epsg)
 
         ###################### clip de l'image mergée en fonction du shapefile de la zone ###################
         clip_command_B04 = ["gdalwarp", "-cutline", out_shp, "-crop_to_cutline",
@@ -173,7 +180,7 @@ def projection(srid_out):
     spatialRef.ImportFromEPSG(srid_out)
 
     spatialRef.MorphToESRI()
-    file = open('polygon32631.prj', 'w')
+    file = open('polygonShape.prj', 'w')
     file.write(spatialRef.ExportToWkt())
     file.close()
 
