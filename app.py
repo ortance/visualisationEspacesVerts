@@ -9,7 +9,6 @@ import json
 import geojson
 from sqlalchemy import *
 from functions import format_geojson
-# from tasks import test
 from celery import Celery
 import time
 
@@ -45,7 +44,7 @@ def get_javascript_data():
     result = test.delay(data_search)
 
     return jsonify({'message': 'le traitement est en cours', 'bdd': 'ndvi_'+ city, 'id_task': result.id})
-#
+
 @app.route('/checkCeleryTask', methods=['POST'])
 def state_celery_task():
     params = request.json
@@ -69,14 +68,17 @@ def get_ndviAuto():
     epsg = profile['crs']['init'][5:]
 
     ndvi_table = ndvi_auto(table_name, epsg)
-    query1 = select([ndvi_table.c.ogc_fid.label('ogc_fid'), func.ST_AsGeoJSON(func.ST_Transform(ndvi_table.c.wkb_geometry,4326)).label('wkb_geometry')]).where(ndvi_table.c.wkb_geometry!=None)
+    query1 = select([ndvi_table.c.ogc_fid.label('ogc_fid'),
+                    func.ST_AsGeoJSON(
+                        func.ST_Transform(
+                            ndvi_table.c.wkb_geometry,4326)).label('wkb_geometry')]).where(ndvi_table.c.wkb_geometry!=None)
     dataQuery = db.session.execute(query1).fetchall()
 
     queryX = select([func.ST_X(
                             func.ST_Centroid(
                                 func.ST_Extent(
                                     func.ST_Transform(
-                                        func.ST_Transform(ndvi_table.c.wkb_geometry, epsg), 4326)
+                                        ndvi_table.c.wkb_geometry, 4326)
                     )))])
     dataQueryX = db.session.execute(queryX).fetchall()
 
@@ -84,7 +86,7 @@ def get_ndviAuto():
                         func.ST_Centroid(
                             func.ST_Extent(
                                 func.ST_Transform(
-                                    func.ST_Transform(ndvi_table.c.wkb_geometry, epsg), 4326)
+                                    ndvi_table.c.wkb_geometry, 4326)
                     )))])
     dataQueryY = db.session.execute(queryY).fetchall()
 
