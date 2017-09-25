@@ -1,5 +1,12 @@
-# informations nécessaires à la connexion à la base de données
-SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:perretho@localhost:5432/naturalite'
+#critères de connexion à la base de données
+dbName ='naturalite'
+user='postgres'
+host='localhost'
+port=5432
+password='perretho'
+
+#connexion à la base de données
+SQLALCHEMY_DATABASE_URI = 'postgresql://' + str(user) + ':' + str(password) + '@' + str(host) + ':' + str(port) + '/' + str(dbName)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 DEBUG = True
 

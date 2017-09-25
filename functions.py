@@ -15,7 +15,7 @@ import subprocess
 import gdal
 import sys
 
-def main_script(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords, dateBegin, dateEnd):
+def main_script(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords, dateBegin, dateEnd, dbName, user, host, port, password):
     EOS_API_KEY = os.environ['EOS_API_KEY']
 
     request_coords = []
@@ -108,11 +108,13 @@ def main_script(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, co
         binarize(r'ndvi_clip_binarized.tif', "ndvi_clip.tif", "binarized.tif", thresholdNDVI)
 
         ################# polygonisation et import dans PostgreSQL #################
+        connect = "dbname=" + str(dbName) + " user=" + str(user) + " host=" + str(host) + " port=" + str(port) + " password=" + str(password)
+        dbName, user, host, port, password
         gm = os.path.join('C:\\','OSGeo4W64','bin','gdal_polygonize.py')
         polygon_command = ["python", gm, "-mask",
                             "ndvi_clip_binarized.tif",
                             "ndvi_clip_binarized.tif", "-f", "PostgreSQL",
-                            "PG: dbname=naturalite user=postgres host=localhost port=5432 password=perretho",
+                            "PG:" + connect,
                             "ndvi_" + city]
         subprocess.call(polygon_command)
 

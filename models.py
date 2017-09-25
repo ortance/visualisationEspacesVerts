@@ -12,7 +12,7 @@ import datetime
 db = SQLAlchemy()
 
 class passData():
-    def __init__(self, sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords, dateBegin, dateEnd):
+    def __init__(self, sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords, dateBegin, dateEnd, dbName, user, host, port, password):
         self.sunElevation = sunElevation
         self.cloudCoverage = cloudCoverage
         self.thresholdNDVI = thresholdNDVI
@@ -22,6 +22,12 @@ class passData():
         self.dateBegin = dateBegin
         self.dateEnd = dateEnd
         self.coords.append(self.coords[0])
+        self.dbName = dbName
+        self.user = user
+        self.host = host
+        self.port = port
+        self.password = password
+
         self.data_dict = [{'sunElevation':self.sunElevation,
                             'cloudCoverage':self.cloudCoverage,
                             'thresholdNDVI':self.thresholdNDVI,
@@ -33,7 +39,7 @@ class passData():
                             }]
 
     def calcul(self):
-        main_script(self.sunElevation, self.cloudCoverage, self.thresholdNDVI, self.limitScene, self.city, self.coords, self.dateBegin, self.dateEnd)
+        main_script(self.sunElevation, self.cloudCoverage, self.thresholdNDVI, self.limitScene, self.city, self.coords, self.dateBegin, self.dateEnd, self.dbName, self.user, self.host, self.port, self.password)
         return (print("traitement terminé"))
 
 
