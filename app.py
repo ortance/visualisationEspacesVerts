@@ -36,7 +36,9 @@ def get_javascript_data():
     params = request.json
     city = params['city']
     coords = params['coords']
-    data_search = passData(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords)
+    dateBegin = params['dateBegin']
+    dateEnd = params['dateEnd']
+    data_search = passData(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords, dateBegin, dateEnd)
     result = test.delay(data_search)
 
     return jsonify({'message': 'le traitement est en cours', 'city': city, 'bdd': 'ndvi_'+ city, 'id_task': result.id})

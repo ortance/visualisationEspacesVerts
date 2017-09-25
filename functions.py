@@ -15,18 +15,30 @@ import subprocess
 import gdal
 import sys
 
-def main_script(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords):
+def main_script(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords, dateBegin, dateEnd):
     EOS_API_KEY = os.environ['EOS_API_KEY']
 
     request_coords = []
     for i in range(0, len(coords)):
         request_coords.append([coords[i]['lng'], coords[i]['lat']])
 
+    dateBegin = dateBegin.split('/')
+    dateBeginYear = dateBegin[0]
+    dateBeginMonth = dateBegin[1]
+    dateBeginDay = dateBegin[2]
+    dateIn = dateBeginYear + "-" + dateBeginMonth + "-" + dateBeginDay
+
+    dateEnd = dateEnd.split('/')
+    dateEndYear = dateEnd[0]
+    dateEndMonth = dateEnd[1]
+    dateEndDay = dateEnd[2]
+    dateOut = dateEndYear + "-" + dateEndMonth + "-" + dateEndDay
+
     request_body = {
     "search": {
        "sunElevation": {"from":0,"to":sunElevation},
        "cloudCoverage": {"from":0,"to":cloudCoverage},
-    #    "date": {"from":"2017-07-11","to":"2017-07-13"},
+       "date": {"from":dateIn,"to":dateOut},
        "shape": {"type":"Polygon","coordinates":[
                     request_coords
        ]}
