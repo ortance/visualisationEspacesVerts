@@ -2,5 +2,9 @@
 SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:perretho@localhost:5432/naturalite'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 DEBUG = True
-# CELERY_BROKER_URL='amqp://jimmy:jimmy123@localhost/jimmy_vhost'
-# CELERY_RESULT_BACKEND='rpc://'
+
+# critères de recherche des images sat
+sunElevation = 70
+cloudCoverage = 5
+thresholdNDVI = 0.35
+limitScene = 1

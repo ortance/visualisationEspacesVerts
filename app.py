@@ -11,7 +11,7 @@ from sqlalchemy import *
 from functions import format_geojson
 from celery import Celery
 import time
-
+from config import *
 
 metadata = MetaData(db)
 
@@ -34,16 +34,12 @@ def test(data_search):
 @app.route('/getFormData', methods=['POST'])
 def get_javascript_data():
     params = request.json
-    sunElevation = params['sunElevation']
-    cloudCoverage = params['cloudCoverage']
-    thresholdNDVI = params['thresholdNDVI']
-    limitScene = params['limitScene']
     city = params['city']
     coords = params['coords']
     data_search = passData(sunElevation, cloudCoverage, thresholdNDVI, limitScene, city, coords)
     result = test.delay(data_search)
 
-    return jsonify({'message': 'le traitement est en cours', 'bdd': 'ndvi_'+ city, 'id_task': result.id})
+    return jsonify({'message': 'le traitement est en cours', 'city': city, 'bdd': 'ndvi_'+ city, 'id_task': result.id})
 
 @app.route('/checkCeleryTask', methods=['POST'])
 def state_celery_task():
