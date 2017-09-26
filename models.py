@@ -43,9 +43,9 @@ class passData():
         return (print("traitement terminé"))
 
 
-def ndvi_auto(city, epsg):
+def ndvi_auto(table_name, epsg):
     return table(
-        '{}'.format(city),
+        '{}'.format(table_name),
         db.Column('ogc_fid', db.Integer),
         db.Column('wkb_geometry', Geometry(geometry_type='POLYGON',
                                         srid=epsg)))
